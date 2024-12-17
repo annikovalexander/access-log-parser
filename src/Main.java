@@ -4,8 +4,17 @@ import java.util.Scanner;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-         System.out.printf("Введите текст и нажмите <Enter>: ");
-         String text = new Scanner(System.in).nextLine();
-         System.out.println("Длина текста: " + text.length());
+        System.out.println("Введите первое число:");
+        int n1 = new Scanner(System.in).nextInt();
+        System.out.println("Введите второе число:");
+        int n2 = new Scanner(System.in).nextInt();
+        int sum=n1+n2;
+        System.out.println("Сумма равна: " + sum);
+        int diff=n1-n2;
+        System.out.println("Разность равна: " + diff);
+        int mul=n1*n2;
+        System.out.println("Произведение равно: " + mul);
+        double quo=(double)n1/n2;
+        System.out.println("Частное равно: " + quo);
         }
     }
