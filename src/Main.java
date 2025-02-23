@@ -16,7 +16,7 @@ public class Main {
                 System.out.println("Указанный файл не существует");
                 continue;
             } else if (isDirectory) {
-                System.out.println("Указанный путь является путём к папке, а не к файлу!");
+                System.out.println("Указанный путь является путём к папке, а не к файлу");
                 continue;
             }
 
@@ -25,8 +25,8 @@ public class Main {
             N += 1;
 
             int totalLines = 0;
-            int maxLength = 0;
-            int minLength = Integer.MAX_VALUE;
+            int googlebotCount = 0;
+            int yandexBotCount = 0;
 
             try (FileReader fileReader = new FileReader(path);
                  BufferedReader reader = new BufferedReader(fileReader)) {
@@ -34,24 +34,49 @@ public class Main {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     totalLines++;
-                    int length = line.length();
 
-                    if (length > 1024) {
+                    if (line.length() > 1024) {
                         throw new TooLongStringException("Строка длиннее 1024 символов: " + line);
                     }
 
-                    if (length > maxLength) {
-                        maxLength = length;
+                    String[] parts = line.split(" ", 12);
+                    if (parts.length < 12) {
+                        System.out.println("Некорректный формат строки: " + line);
+                        continue;
                     }
 
-                    if (length < minLength) {
-                        minLength = length;
+                    String ip = parts[0];
+                    String dash1 = parts[1];
+                    String dash2 = parts[2];
+                    String dateTime = parts[3] + " " + parts[4];
+                    String method = parts[5].replace("\"", "");
+                    String pathRequest = parts[6];
+                    String httpVersion = parts[7];
+                    String statusCode = parts[8];
+                    String responseSize = parts[9];
+                    String referer = parts[10].replace("\"", "");
+                    String userAgent = parts[11].replace("\"", "");
+
+                    String botName = extractBotName(userAgent);
+                    if (botName != null) {
+                        if (botName.equals("Googlebot")) {
+                            googlebotCount++;
+                        } else if (botName.equals("YandexBot")) {
+                            yandexBotCount++;
+                        }
                     }
                 }
 
-                System.out.println("Общее количество строк: " + totalLines);
-                System.out.println("Длина самой длинной строки: " + maxLength);
-                System.out.println("Длина самой короткой строки: " + (minLength == Integer.MAX_VALUE ? 0 : minLength));
+                System.out.println("Общее количество запросов: " + totalLines);
+                System.out.println("Количество запросов от Googlebot: " + googlebotCount);
+                System.out.println("Количество запросов от YandexBot: " + yandexBotCount);
+
+                if (totalLines > 0) {
+                    double googlebotPercentage = (double) googlebotCount / totalLines * 100;
+                    double yandexBotPercentage = (double) yandexBotCount / totalLines * 100;
+                    System.out.printf("Доля запросов от Googlebot: %.2f%%\n", googlebotPercentage);
+                    System.out.printf("Доля запросов от YandexBot: %.2f%%\n", yandexBotPercentage);
+                }
 
             } catch (TooLongStringException e) {
                 System.out.println(e.getMessage());
@@ -60,6 +85,21 @@ public class Main {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private static String extractBotName(String userAgent) {
+        String[] parts = userAgent.split(";");
+        for (String part : parts) {
+            part = part.trim();
+            if (part.startsWith("Googlebot") || part.startsWith("YandexBot")) {
+                int slashIndex = part.indexOf('/');
+                if (slashIndex != -1) {
+                    return part.substring(0, slashIndex).trim();
+                }
+                return part.trim();
+            }
+        }
+        return null;
     }
 }
 
