@@ -16,7 +16,7 @@ public class Main {
                 System.out.println("Указанный файл не существует");
                 continue;
             } else if (isDirectory) {
-                System.out.println("Указанный путь является путём к папке, а не к файлу");
+                System.out.println("Указанный путь является путём к папке, а не к файлу!");
                 continue;
             }
 
