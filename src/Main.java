@@ -27,6 +27,7 @@ public class Main {
             int totalLines = 0;
             int googlebotCount = 0;
             int yandexBotCount = 0;
+            Statistics statistics = new Statistics();
 
             try (FileReader fileReader = new FileReader(path);
                  BufferedReader reader = new BufferedReader(fileReader)) {
@@ -34,6 +35,8 @@ public class Main {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     totalLines++;
+                    LogEntry entry = new LogEntry(line);
+                    statistics.addEntry(entry);
 
                     if (line.length() > 1024) {
                         throw new TooLongStringException("Строка длиннее 1024 символов: " + line);
@@ -84,6 +87,7 @@ public class Main {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+            System.out.println("Средний объём трафика за час: " + statistics.getTrafficRate() + " байт/час");
         }
     }
 
@@ -101,6 +105,7 @@ public class Main {
         }
         return null;
     }
+
 }
 
 class TooLongStringException extends RuntimeException {
